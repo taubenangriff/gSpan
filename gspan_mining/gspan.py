@@ -332,9 +332,7 @@ class gSpan(object):
         display_str = g.display()
         print('\nSupport: {}'.format(self._support))
 
-        # Add some report info to pandas dataframe "self._report_df".
-        self._report_df = self._report_df.append(
-            pd.DataFrame(
+        newframe = pd.DataFrame(
                 {
                     'support': [self._support],
                     'description': [display_str],
@@ -342,7 +340,9 @@ class gSpan(object):
                 },
                 index=[int(repr(self._counter)[6:-1])]
             )
-        )
+
+        # Add some report info to pandas dataframe "self._report_df".
+        pd.concat([self._report_df, newframe])
         if self._visualize:
             g.plot()
         if self._where:
