@@ -126,15 +126,14 @@ class Graph(object):
                     print('e {} {} {}'.format(frm, to, edges[to].elb))
                     display_str += 'e {} {} {}'.format(frm, to, edges[to].elb)
         return display_str
-
-    def plot(self):
-        """Visualize the graph."""
+    
+    def as_nx_graph(self):
         try:
-            import networkx as nx
-            import matplotlib.pyplot as plt
+            import networkx as nx        
         except Exception as e:
-            print('Can not plot graph: {}'.format(e))
+            print('Can not transform to networkx graph: {}'.format(e))
             return
+        
         gnx = nx.Graph() if self.is_undirected else nx.DiGraph()
         vlbs = {vid: v.vlb for vid, v in self.vertices.items()}
         elbs = {}
@@ -143,8 +142,23 @@ class Graph(object):
         for vid, v in self.vertices.items():
             for to, e in v.edges.items():
                 if (not self.is_undirected) or vid < to:
-                    gnx.add_edge(vid, to, label=e.elb)
+                    gnx.add_edge(vid, to, d=e.elb)
                     elbs[(vid, to)] = e.elb
+
+        return gnx, vlbs, elbs
+
+
+    def plot(self):
+        """Visualize the graph."""
+        try:
+            import networkx as nx   
+            import matplotlib.pyplot as plt
+        except Exception as e:
+            print('Can not plot graph: {}'.format(e))
+            return
+        
+        gnx, vlbs, elbs = self.as_nx_graph()
+
         fsize = (min(16, 1 * len(self.vertices)),
                  min(16, 1 * len(self.vertices)))
         plt.figure(3, figsize=fsize)
